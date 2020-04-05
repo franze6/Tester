@@ -1,0 +1,10 @@
+.container {
+  border: solid 1px;
+  margin: auto;
+  padding: 25px;
+  border-radius: 5px;
+}
+
+input {
+  margin: 10px;
+}
