@@ -8,3 +8,7 @@
 input {
   margin: 10px;
 }
+
+.ui-select-control {
+  width: 250px;
+}

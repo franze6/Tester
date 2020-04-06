@@ -8,15 +8,15 @@
     </div>
     <div class="current_tests">
         <h2>Доступные тесты:</h2>
-        <ul class="list_of_tests">
+        <div class="list_of_tests list-group">
             <?php
             foreach ($avalible_tests as $test) {
                 $id = $test['id'];
                 $name = $test['test_name'];
                 $owner = $test['user_name'];
-                echo "<li><a data-id='test_$id' href=''>$name ($owner)</a></li>";
+                echo "<a class='list-group-item list-group-item-action' href='?page=test&id=$id'>$name ($owner)</a>";
             }
             ?>
-        </ul>
+        </div>
     </div>
 </div>

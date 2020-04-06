@@ -18,7 +18,7 @@ class Worker
 
     function getAllTests() {
         if($this->connection == null)
-            return;
+            return 0;
         $arr = array();
         $result = $this->connection->query("SELECT tests.id, tests.name as 'test_name', users.name as 'user_name' FROM tests INNER JOIN users ON tests.owner = users.id");
         if ($result) {
@@ -38,7 +38,7 @@ class Worker
 
     function addTest($name, $id) {
         if($this->connection == null)
-            return;
+            return 0;
         $result = $this->connection->query("SELECT COUNT(id) as 'count' FROM tests WHERE `name`='$name' AND `owner`='$id'");
         $data['isError'] = false;
         if(!$result->fetch_assoc()['count'] == "0") {
@@ -54,7 +54,7 @@ class Worker
 
     function addQuestion($name, $id) {
         if($this->connection == null)
-            return;
+            return 0;
         $result = $this->connection->query("SELECT COUNT(id) as 'count' FROM questions WHERE `text`='$name' AND `test_id`='$id'");
         $data['isError'] = false;
         if(!$result->fetch_assoc()['count'] == "0") {
@@ -70,7 +70,7 @@ class Worker
 
     function addAnswer($name, $id) {
         if($this->connection == null)
-            return;
+            return 0;
         $result = $this->connection->query("SELECT COUNT(id) as 'count' FROM answers WHERE `text`='$name' AND `question_id`='$id'");
         $data['isError'] = false;
         if(!$result->fetch_assoc()['count'] == "0") {
@@ -82,6 +82,34 @@ class Worker
             $data['result'] = $this->connection->insert_id;
         }
         return $data;
+    }
+
+    function setRightAnswer($question_id, $answer_id) {
+        if($this->connection == null)
+            return 0;
+        $this->connection->query("UPDATE `questions` SET `right_answer`='$answer_id' WHERE `id`='$question_id'");
+        $data['isError'] = false;
+        $data['result'] = 1;
+        return $data;
+    }
+
+    function getTestDataById($id) {
+        if($this->connection == null)
+            return;
+        $result = $this->connection->query("SELECT * FROM `questions` WHERE `test_id`='$id'");
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $question_id = $row['id'];
+                $subresult = $this->connection->query("SELECT * FROM `answers` WHERE `question_id`='$question_id'");
+                while ($subrow = $subresult->fetch_assoc()) {
+                    $row['answers'][] = $subrow;
+                }
+                $subresult->free();
+                $arr[] = $row;
+            }
+            $result->free();
+            return $arr;
+        }
     }
 }
 

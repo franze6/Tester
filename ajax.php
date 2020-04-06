@@ -23,4 +23,12 @@ if($do == "new_user") {
     if(!isset($_REQUEST['answer_name']) && !isset($_REQUEST['question_id']))
         return 0;
     echo json_encode($work->addAnswer($_REQUEST['answer_name'], $_REQUEST['question_id']));
+} elseif ($do == "right_answer") {
+    if(!isset($_REQUEST['question_id']) && !isset($_REQUEST['answer_id']))
+        return 0;
+    echo json_encode($work->setRightAnswer($_REQUEST['question_id'], $_REQUEST['answer_id']));
+}  elseif ($do == "get_test") {
+    if(!isset($_REQUEST['id']))
+        return 0;
+    echo json_encode($work->getTestDataById($_REQUEST['id']));
 }
