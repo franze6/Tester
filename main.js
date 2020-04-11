@@ -1,5 +1,6 @@
 var current_test = {};
 var listeners = {};
+var uiStatus = {};
 $(document).ready(function () {
     $('#start_btn').click(function () {
         $.ajax({
@@ -11,6 +12,17 @@ $(document).ready(function () {
             }
         });
     });
+
+    var test_elm = $(".questions_list_test");
+    if (test_elm.length == 1) {
+        loadQuestionList(test_elm.attr('data-id'));
+    }
+
+    $('#next_question').click(function () {
+        var parent = $(this).parent().parent();
+        sendResultQuestion($('.active').attr('data-id'))
+    });
+
     $('#add_question').click(addQuestion);
     $('#test_name').focusout(addTest);
 });
@@ -54,7 +66,7 @@ function addQuestion() {
         textarea = $('<textarea>', {'class': 'question_text form-control'}),
         answers_label = $('<h4>', {'text': 'Ответы:'}),
         select_menu = $('<select>', {'class': 'select_menu form-control'}),
-        select_label = $('<option>', { 'text': 'Выберите правильный ответ...', 'disabled':'', 'selected':''}),
+        select_label = $('<option>', {'text': 'Выберите правильный ответ...', 'disabled': '', 'selected': ''}),
         answers = $('<div class="answers_list container">'),
         add_answer = $('<input>', {
             'class': 'add_answer btn btn-primary',
@@ -130,7 +142,7 @@ function addAnswer() {
     }
 
     var newAElm = $('<div>', {'class': 'answer'}),
-        answer_label = $('<span>', {'text': 'Введите текст ответа '+ (current_test.questions[this.questionId].answers_count + 1) +':'}),
+        answer_label = $('<span>', {'text': 'Введите текст ответа ' + (current_test.questions[this.questionId].answers_count + 1) + ':'}),
         textarea = $('<textarea>', {'class': 'answer_text form-control'});
     textarea['0'].questionId = this.questionId;
     newAElm.append(answer_label);
@@ -164,7 +176,7 @@ function addAnswerText() {
                 current_test.questions[this.questionId].answers[this.Id] = {};
             current_test.questions[this.questionId].answers[this.Id].text = $(this).val();
             current_test.questions[this.questionId].answers[this.Id].number = ++current_test.questions[this.questionId].answers_count;
-            if(current_test.questions[this.questionId].answers_count == 1)
+            if (current_test.questions[this.questionId].answers_count == 1)
                 sendRightAnswer(this.questionId, this.Id);
 
             fireEvent('addAnswer', this);
@@ -174,8 +186,8 @@ function addAnswerText() {
 
 function rightAnswerChange() {
     var question_id = $(this).attr('data-id'),
-        answer_id = $( "option:selected" , this).attr('data-id');
-    if(!current_test.questions[question_id].rightAnswer) {
+        answer_id = $("option:selected", this).attr('data-id');
+    if (!current_test.questions[question_id].rightAnswer) {
         current_test.questions[question_id].rightAnswer = undefined;
     }
     current_test.questions[question_id].rightAnswer = answer_id;
@@ -183,7 +195,7 @@ function rightAnswerChange() {
     sendRightAnswer(question_id, answer_id);
 }
 
-function sendRightAnswer(question_id, answer_id)  {
+function sendRightAnswer(question_id, answer_id) {
     $.ajax({
         type: "post",
         url: "ajax.php",
@@ -201,6 +213,91 @@ function sendRightAnswer(question_id, answer_id)  {
         }
     });
 }
+
+function loadQuestionList(id) {
+    $.ajax({
+        type: "post",
+        url: "ajax.php",
+        data: "do=get_test&id=" + id,
+        success: (response) => {
+            if (response == 0) {
+                alert('Ошибка получения списка ответов!');
+                return;
+            }
+            var data = JSON.parse(response);
+            if (data.isError) {
+                alert(data.result);
+                return;
+            }
+            current_test = data;
+            current_test.id = id;
+            current_test.current_question = 0;
+            generateQuestionCard();
+        }
+    });
+}
+
+function generateQuestionCard() {
+    var rootElm = $("#current_question"),
+        questionObj = current_test.questions[current_test.current_question],
+        question_text = $("<div>", {"class": "row"}).append($("<h2>", {"text": questionObj.text})),
+        answers_list = $("<div>", {"class": "list-group answers_list"});
+    for (key in questionObj.answers) {
+        var answer = questionObj.answers[key],
+            answerElm = $("<button>", {
+                "type": "button",
+                "class": "list-group-item list-group-item-action",
+                "data-id": answer.id,
+                "text": answer.text
+            });
+        answers_list.append(answerElm);
+        $(answerElm).click(function () {
+            var parent = $(this).parent();
+            var id = $(this).attr('data-id');
+            var selected = parent.children("[data-id=" + id + "]");
+            var others = parent.children("[data-id!=" + id + "]");
+            selected.toggleClass("active");
+            others.removeClass("active");
+        });
+    }
+    rootElm.empty();
+    rootElm.append(question_text);
+    rootElm.append(answers_list);
+
+    uiStatus.free();
+}
+
+function sendResultQuestion(id) {
+    uiStatus.busy();
+    var result_id = current_test.result_id,
+        answer_id = $('.answers_list .list-group-item-action,.active').attr('data-id');
+    $.ajax({
+        type: "post",
+        url: "ajax.php",
+        data: "do=set_question_result&question_id=" + id + "&answer_id=" + answer_id + "&result_id=" + result_id,
+        success: (response) => {
+            if (response == 0) {
+                alert('Ошибка получения списка ответов!');
+                return;
+            }
+            var data = JSON.parse(response);
+            if (data.isError) {
+                alert(data.result);
+                return;
+            }
+            if(current_test.questions.length > current_test.current_question + 1) {
+                current_test.current_question++;
+                generateQuestionCard();
+            }
+            else {
+                uiStatus.free();
+                alert("Тест закончился!");
+                window.location = "index.php";
+            }
+        }
+    });
+}
+
 
 function addListener(event_name, callback) {
     if (!listeners[event_name])
@@ -223,10 +320,23 @@ function fireEvent(event_name, scope, arguments) {
 }
 
 function sliceText(text) {
-    var sliced = text.slice(0,25);
+    var sliced = text.slice(0, 25);
     if (sliced.length < text.length) {
         sliced += '...';
     }
     return sliced;
 }
+
+uiStatus.busy = function () {
+    var body = $(document.body);
+    if (body.hasClass("loaded"))
+        body.removeClass("loaded");
+};
+
+uiStatus.free = function () {
+    var body = $(document.body);
+    if (!body.hasClass("loaded")) {
+        body.addClass("loaded");
+    }
+};
 

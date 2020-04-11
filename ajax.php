@@ -31,4 +31,8 @@ if($do == "new_user") {
     if(!isset($_REQUEST['id']))
         return 0;
     echo json_encode($work->getTestDataById($_REQUEST['id']));
+} elseif ($do == "set_question_result") {
+    if(!isset($_REQUEST['question_id'], $_REQUEST['answer_id'], $_REQUEST['result_id']))
+        return 0;
+    echo json_encode($work->setQuestionResult($_REQUEST['question_id'], $_REQUEST['answer_id'], $_REQUEST['result_id']));
 }
