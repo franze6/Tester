@@ -1,9 +1,12 @@
 <div class="container">
-    <span>Добро пожаловать, <?= $user_name ?></span>
+    <span>Добро пожаловать, <?= $user_name ?>!</span>
     <div class="avalible_func">
+        <div class="btn-group">
+            <a class="btn btn-primary" href="?page=create">Создать тест</a>
+            <a class="btn btn-primary" href="?page=results_list">Посмотреть результаты</a>
+        </div>
         <ui>
-            <li><a href="?page=create">Создать свой тест</a></li>
-            <li><a href="">Посмотреть результаты</a></li>
+
         </ui>
     </div>
     <div class="current_tests">

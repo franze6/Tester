@@ -1,12 +1,14 @@
 <?php
+
 class Worker
 {
     private $connection = null;
     function db_connect()
     {
+        require_once "./config.php";
         if($this->connection != null)
             return;
-        $this->connection = new mysqli("localhost", "root", "", "tester");
+        $this->connection = new mysqli("localhost", $login, $password, $db);
         $this->connection->set_charset("utf8");
     }
 
@@ -108,6 +110,8 @@ class Worker
         if($this->connection == null)
             return;
         $result_id = $this->createResultRow($id);
+        $test_data = $this->connection->query("SELECT tests.name as 'test_name', users.name as 'user_name' FROM tests INNER JOIN users ON tests.owner = users.id WHERE tests.id='$id'");
+        $arr = $test_data->fetch_assoc();
         $result = $this->connection->query("SELECT * FROM `questions` WHERE `test_id`='$id'");
         if ($result) {
             while ($row = $result->fetch_assoc()) {
@@ -139,6 +143,47 @@ class Worker
         $this->connection->query("INSERT INTO trace_list(`question_id`, `answer_id`, `result_id`) VALUES ('$question_id', '$answer_id', '$result_id')");
         $data['result'] = $this->connection->insert_id;
         return $data;
+    }
+
+    function getResultData($id) {
+        if($this->connection == null)
+            return;
+        $result = $this->connection->query("SELECT question_id, answer_id FROM `trace_list` WHERE `result_id`='$id'");
+        $test_id = $this->connection->query("SELECT test_id FROM `results` WHERE `id`='$id'")->fetch_assoc()['test_id'];
+        $arr['test_data'] = $this->getTestDataById($test_id);
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $arr['result_data'][]=$row;
+            }
+            $result->free();
+            return $arr;
+        }
+    }
+
+    function getMyResults() {
+        $id = $this->getUserIdbyName($_COOKIE["user_name"]);
+        $result = $this->connection->query("SELECT `results`.`id`, `tests`.`name` as 'test_name', `results`.`date`, `users`.`name` as 'user_name' FROM `results` INNER JOIN `tests` ON `tests`.`id` = `results`.`test_id` INNER JOIN `users` ON `tests`.`owner` = `users`.`id` WHERE `results`.`user_id`='$id'");
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $arr[]=$row;
+            }
+            $result->free();
+            return $arr;
+        }
+        return 0;
+    }
+
+    function getOtherResults() {
+        $id = $this->getUserIdbyName($_COOKIE["user_name"]);
+        $result = $this->connection->query("SELECT `results`.`id`, `tests`.`name` as 'test_name', `results`.`date`, `users`.`name` as 'user_name' FROM `results` INNER JOIN `tests` ON `results`.`test_id` = `tests`.`id` INNER JOIN `users` ON `tests`.`owner` = `users`.`id` WHERE `tests`.`owner` ='$id'");
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $arr[]=$row;
+            }
+            $result->free();
+            return $arr;
+        }
+        return 0;
     }
 }
 

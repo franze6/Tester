@@ -1,5 +1,3 @@
-<?php
-?>
 <div class="container">
     <h2>Создание своего теста</h2>
     <div id="create_test_form" class="ui-widget">

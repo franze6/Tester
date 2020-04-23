@@ -35,4 +35,17 @@ if($do == "new_user") {
     if(!isset($_REQUEST['question_id'], $_REQUEST['answer_id'], $_REQUEST['result_id']))
         return 0;
     echo json_encode($work->setQuestionResult($_REQUEST['question_id'], $_REQUEST['answer_id'], $_REQUEST['result_id']));
+} elseif ($do == "get_result") {
+    if(!isset($_REQUEST['id']))
+        return 0;
+    echo json_encode($work->getResultData($_REQUEST['id']));
+} elseif ($do == "get_result_list") {
+    if(!isset($_REQUEST['type']))
+        return 0;
+    if($_REQUEST['type'] == "my") 
+    echo json_encode($work->getMyResults());
+    elseif($_REQUEST['type'] == "other")
+    echo json_encode($work->getOtherResults());
 }
+
+

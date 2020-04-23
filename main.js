@@ -18,9 +18,33 @@ $(document).ready(function () {
         loadQuestionList(test_elm.attr('data-id'));
     }
 
+    var result_elm = $(".result_list");
+    if (result_elm.length == 1) {
+        //debugger;
+        loadResult(result_elm.attr('data-id'));
+    }
+
+    var results_list = $("#results_list");
+    if (results_list.length == 1) {
+        loadResults("my");
+        $('#my_results-tab').click(function () {
+            loadResults("my");
+        });
+        $('#other_results-tab').click(function () {
+            loadResults("other");
+        });
+    }
+
     $('#next_question').click(function () {
-        var parent = $(this).parent().parent();
         sendResultQuestion($('.active').attr('data-id'))
+    });
+
+    $('#prev_question').click(function () {
+        if (current_test.current_question > 0) {
+            current_test.current_question--;
+            generateQuestionCard();
+        }
+        else alert("Назад низя!");
     });
 
     $('#add_question').click(addQuestion);
@@ -62,11 +86,11 @@ function addQuestion() {
     }
     //$('#add_question').prop('disabled', true);
     var newQElm = $('<div class="container question">'),
-        label = $('<span>', {'text': 'Введите текст вопроса:'}),
-        textarea = $('<textarea>', {'class': 'question_text form-control'}),
-        answers_label = $('<h4>', {'text': 'Ответы:'}),
-        select_menu = $('<select>', {'class': 'select_menu form-control'}),
-        select_label = $('<option>', {'text': 'Выберите правильный ответ...', 'disabled': '', 'selected': ''}),
+        label = $('<span>', { 'text': 'Введите текст вопроса:' }),
+        textarea = $('<textarea>', { 'class': 'question_text form-control' }),
+        answers_label = $('<h4>', { 'text': 'Ответы:' }),
+        select_menu = $('<select>', { 'class': 'select_menu form-control' }),
+        select_label = $('<option>', { 'text': 'Выберите правильный ответ...', 'disabled': '', 'selected': '' }),
         answers = $('<div class="answers_list container">'),
         add_answer = $('<input>', {
             'class': 'add_answer btn btn-primary',
@@ -141,9 +165,9 @@ function addAnswer() {
         return;
     }
 
-    var newAElm = $('<div>', {'class': 'answer'}),
-        answer_label = $('<span>', {'text': 'Введите текст ответа ' + (current_test.questions[this.questionId].answers_count + 1) + ':'}),
-        textarea = $('<textarea>', {'class': 'answer_text form-control'});
+    var newAElm = $('<div>', { 'class': 'answer' }),
+        answer_label = $('<span>', { 'text': 'Введите текст ответа ' + (current_test.questions[this.questionId].answers_count + 1) + ':' }),
+        textarea = $('<textarea>', { 'class': 'answer_text form-control' });
     textarea['0'].questionId = this.questionId;
     newAElm.append(answer_label);
     newAElm.append(textarea);
@@ -232,6 +256,7 @@ function loadQuestionList(id) {
             current_test = data;
             current_test.id = id;
             current_test.current_question = 0;
+            $('#test_name>h3').text(current_test.test_name + "(" + current_test.user_name + ")");
             generateQuestionCard();
         }
     });
@@ -240,8 +265,8 @@ function loadQuestionList(id) {
 function generateQuestionCard() {
     var rootElm = $("#current_question"),
         questionObj = current_test.questions[current_test.current_question],
-        question_text = $("<div>", {"class": "row"}).append($("<h2>", {"text": questionObj.text})),
-        answers_list = $("<div>", {"class": "list-group answers_list"});
+        question_text = $("<div>").append($("<h4>", { "text": questionObj.text })),
+        answers_list = $("<div>", { "class": "list-group answers_list" });
     for (key in questionObj.answers) {
         var answer = questionObj.answers[key],
             answerElm = $("<button>", {
@@ -270,11 +295,22 @@ function generateQuestionCard() {
 function sendResultQuestion(id) {
     uiStatus.busy();
     var result_id = current_test.result_id,
-        answer_id = $('.answers_list .list-group-item-action,.active').attr('data-id');
+        answerElm = $('.answers_list .active'),
+        answer_id = '';
+    if (answerElm.length == 0) {
+        alert("Выберите ответ!");
+        uiStatus.free();
+        return;
+    }
+    answer_id = answerElm.attr("data-id");
+    if (answer_id) {
+        console.error("Не удалось получить id ответа");
+    }
     $.ajax({
         type: "post",
         url: "ajax.php",
-        data: "do=set_question_result&question_id=" + id + "&answer_id=" + answer_id + "&result_id=" + result_id,
+        data: "do=set_question_result&question_id=" + current_test.questions[current_test.current_question] +
+            "&answer_id=" + id + "&result_id=" + result_id,
         success: (response) => {
             if (response == 0) {
                 alert('Ошибка получения списка ответов!');
@@ -285,7 +321,7 @@ function sendResultQuestion(id) {
                 alert(data.result);
                 return;
             }
-            if(current_test.questions.length > current_test.current_question + 1) {
+            if (current_test.questions.length > current_test.current_question + 1) {
                 current_test.current_question++;
                 generateQuestionCard();
             }
@@ -296,6 +332,88 @@ function sendResultQuestion(id) {
             }
         }
     });
+}
+
+function loadResult(id) {
+    $.ajax({
+        type: "post",
+        url: "ajax.php",
+        data: "do=get_result&id=" + id,
+        success: (response) => {
+            if (response == 0) {
+                alert('Ошибка получения списка ответов!');
+                return;
+            }
+            var data = JSON.parse(response);
+            if (data.isError) {
+                alert(data.result);
+                return;
+            }
+            var rootElm = $("[data-id=" + id + "]");
+            current_test = data.test_data;
+            $('#test_name>h3', rootElm).text(current_test.test_name + "(" + current_test.user_name + ")");
+            for (key in data.result_data) {
+                var res = data.result_data[key];
+                rootElm.append(generateResultQuestion(res));
+            }
+            //debugger;
+
+        }
+    });
+}
+
+function generateResultQuestion(question) {
+    var questionElm = $("<div>", { "class": "question" }),
+        questionObj = current_test.questions.find((element) => { return element.id == question.question_id ? element : false }),
+        question_text = $("<div>").append($("<h4>", { "text": questionObj.text })),
+        answers_list = $("<ul>", { "class": "list-group answers_list" });
+    for (key in questionObj.answers) {
+        var answer = questionObj.answers[key],
+            answerElm = $("<li>", {
+                "class": "list-group-item",
+                "data-id": answer.id,
+                "text": answer.text
+            });
+        if (questionObj.right_answer == answer.id)
+            answerElm.addClass("list-group-item-success");
+        else if (question.answer_id == answer.id && questionObj.right_answer != answer.id)
+            answerElm.addClass("list-group-item-danger");
+        answers_list.append(answerElm);
+    }
+    questionElm.append(question_text);
+    questionElm.append(answers_list);
+    return questionElm;
+}
+
+function loadResults(type) {
+    uiStatus.busy();
+    $.ajax({
+        type: "post",
+        url: "ajax.php",
+        data: "do=get_result_list&type="+type,
+        success: (response) => {
+            if (response == 0) {
+                alert("Ошибка загрузки");
+                return;
+            }
+            var data = JSON.parse(response);
+            if (data.isError) {
+                alert(data.result);
+                return;
+            }   
+            generateResultsList(data, type);
+            uiStatus.free();
+        }
+    });
+}
+
+function generateResultsList(data, type) {
+    var rootElm = $("<div>", { "class": "list_of_tests list-group" });
+    for (key in data) {
+        rootElm.append($("<a>", { "class": "list-group-item list-group-item-action", "text": data[key].test_name + '(' + data[key].user_name + '):' + data[key].date, "href": "?page=result&id=" + data[key].id }))
+    }
+    $("#"+type+"_results").empty();
+    $("#"+type+"_results").append(rootElm);
 }
 
 
@@ -325,6 +443,18 @@ function sliceText(text) {
         sliced += '...';
     }
     return sliced;
+}
+
+function displayError(text) {
+    var errElm = $("#error_text");
+    errElm.text(text);
+    errElm.slideDown();
+}
+
+function errorHide() {
+    var errElm = $("#error_text");
+    errElm.text("");
+    errElm.slideUp();
 }
 
 uiStatus.busy = function () {

@@ -1,5 +1,4 @@
 .container {
-  border: solid 1px;
   margin: auto;
   padding: 25px;
   border-radius: 5px;
@@ -45,5 +44,9 @@ input {
 }
 
 .loaded .preloader {
+  display: none;
+}
+
+#error_text {
   display: none;
 }
