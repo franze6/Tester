@@ -1,14 +1,21 @@
 var current_test = {};
 var listeners = {};
 var uiStatus = {};
+var navBar = {};
+
 $(document).ready(function () {
+    navBar.generate();
+    navBar.bindPrev(function () {
+        window.location = "index.php";
+    })
     $('#start_btn').click(function () {
         $.ajax({
             type: "post",
             url: "ajax.php",
             data: "do=new_user&user_name=" + $('#user_name').val(),
             success: (response) => {
-                alert(response);
+                if (response == 1)
+                    window.location.href = window.location.href;
             }
         });
     });
@@ -26,6 +33,9 @@ $(document).ready(function () {
 
     var results_list = $("#results_list");
     if (results_list.length == 1) {
+        navBar.addElement(results_list);
+        navBar.hideDone();
+        navBar.setHeaderText("Результаты");
         loadResults("my");
         $('#my_results-tab').click(function () {
             loadResults("my");
@@ -33,6 +43,25 @@ $(document).ready(function () {
         $('#other_results-tab').click(function () {
             loadResults("other");
         });
+    }
+
+    var home_page = $("#home_page");
+    if (home_page.length == 1) {
+        navBar.hideDone();
+        navBar.hidePrev();
+        navBar.setHeaderText("Главная");
+    }
+
+    var avalible = $("#avalible_tests");
+    if (avalible.length == 1) {
+        navBar.hideDone();
+        navBar.setHeaderText("Доступные тесты");
+        loadAvalibleTests.apply(avalible);
+    }
+
+    var create = $("#create_test");
+    if(create.length == 1) {
+        navBar.setHeaderText("Создание теста");
     }
 
     $('#next_question').click(function () {
@@ -51,14 +80,11 @@ $(document).ready(function () {
     $('#test_name').focusout(addTest);
 });
 
-
-function addTest() {
-    if ($(this).val().length < 1 || current_test.TestId)
-        return;
+function loadAvalibleTests() {
     $.ajax({
         type: "post",
         url: "ajax.php",
-        data: "do=new_test&test_name=" + $(this).val(),
+        data: "do=get_avalible_tests",
         success: (response) => {
             if (response == 0) {
                 alert('Ошибка добавления теста!');
@@ -69,6 +95,37 @@ function addTest() {
                 alert(data.result);
                 return;
             }
+            for (key in data) {
+                $(this).append($("<a>", { 
+                    "class": "ios-list-group-item ios-list-group-item-action", 
+                    "href": "?page=test&id=" + data[key].id, 
+                    "text": data[key].test_name + " (" + data[key].user_name + ")" })
+                    .append($("<i>", {"class":"icon-arrow_forward_ios"})));
+            }
+        }
+    });
+}
+
+
+function addTest() {
+    if ($(this).val().length < 1)
+        return;
+    $.ajax({
+        type: "post",
+        url: "ajax.php",
+        data: "do=new_test&test_name=" + $(this).val() + "&test_id=" + current_test.TestId ? current_test.TestId : "-1",
+        success: (response) => {
+            if (response == 0) {
+                alert('Ошибка добавления теста!');
+                return;
+            }
+            var data = JSON.parse(response);
+            if (data.isError) {
+                alert(data.result);
+                return;
+            }
+            if (current_test.TestId)
+                return;
             current_test.TestId = data.result;
             current_test.questions = {};
         }
@@ -118,13 +175,13 @@ function addQuestion() {
 }
 
 function addQuestionText() {
-    if (this.Id || $(this).val().length < 1)
+    if ($(this).val().length < 1)
         return;
     var parent = this.parentElement;
     $.ajax({
         type: "post",
         url: "ajax.php",
-        data: "do=new_question&question_name=" + $(this).val() + "&test_id=" + current_test.TestId,
+        data: "do=new_question&question_name=" + $(this).val() + "&test_id=" + current_test.TestId + "&question_id=" + this.Id ? this.Id : "-1",
         success: (response) => {
             if (response == 0) {
                 alert('Ошибка добавления теста!');
@@ -138,6 +195,8 @@ function addQuestionText() {
             if (!current_test.questions[data.result])
                 current_test.questions[data.result] = {};
             current_test.questions[data.result].text = $(this).val();
+            if (this.Id)
+                return;
             current_test.questions[data.result].answers_count = 0;
             this.Id = data.result;
             $('.add_answer', parent)['0'].questionId = this.Id;
@@ -182,7 +241,7 @@ function addAnswerText() {
     $.ajax({
         type: "post",
         url: "ajax.php",
-        data: "do=new_answer&answer_name=" + $(this).val() + "&question_id=" + this.questionId,
+        data: "do=new_answer&answer_name=" + $(this).val() + "&question_id=" + this.questionId + "&answer_id=" + this.Id ? this.Id : "-1",
         success: (response) => {
             if (response == 0) {
                 alert('Ошибка добавления ответа!');
@@ -193,12 +252,14 @@ function addAnswerText() {
                 alert(data.result);
                 return;
             }
+            current_test.questions[this.questionId].answers[data.result].text = $(this).val();
+            if (this.Id)
+                return;
             this.Id = data.result;
             if (!current_test.questions[this.questionId].answers)
                 current_test.questions[this.questionId].answers = {};
             if (!current_test.questions[this.questionId].answers[this.Id])
                 current_test.questions[this.questionId].answers[this.Id] = {};
-            current_test.questions[this.questionId].answers[this.Id].text = $(this).val();
             current_test.questions[this.questionId].answers[this.Id].number = ++current_test.questions[this.questionId].answers_count;
             if (current_test.questions[this.questionId].answers_count == 1)
                 sendRightAnswer(this.questionId, this.Id);
@@ -215,7 +276,6 @@ function rightAnswerChange() {
         current_test.questions[question_id].rightAnswer = undefined;
     }
     current_test.questions[question_id].rightAnswer = answer_id;
-
     sendRightAnswer(question_id, answer_id);
 }
 
@@ -390,7 +450,7 @@ function loadResults(type) {
     $.ajax({
         type: "post",
         url: "ajax.php",
-        data: "do=get_result_list&type="+type,
+        data: "do=get_result_list&type=" + type,
         success: (response) => {
             if (response == 0) {
                 alert("Ошибка загрузки");
@@ -400,7 +460,7 @@ function loadResults(type) {
             if (data.isError) {
                 alert(data.result);
                 return;
-            }   
+            }
             generateResultsList(data, type);
             uiStatus.free();
         }
@@ -408,14 +468,14 @@ function loadResults(type) {
 }
 
 function generateResultsList(data, type) {
-    var rootElm = $("<div>", { "class": "list_of_tests list-group" });
+    var rootElm = $("<div>", { "class": "list_of_tests ios-list-group" });
     for (key in data) {
-        rootElm.append($("<a>", { "class": "list-group-item list-group-item-action", "text": data[key].test_name + '(' + data[key].user_name + '):' + data[key].date, "href": "?page=result&id=" + data[key].id }))
+        rootElm.append($("<a>", { "class": "ios-list-group-item ios-list-group-item-action", "text": data[key].test_name + '(' + data[key].user_name + '):' + data[key].date, "href": "?page=result&id=" + data[key].id })
+            .append($("<i>", { "class": "icon-arrow_forward_ios" })));
     }
-    $("#"+type+"_results").empty();
-    $("#"+type+"_results").append(rootElm);
+    $("#" + type + "_results").empty();
+    $("#" + type + "_results").append(rootElm);
 }
-
 
 function addListener(event_name, callback) {
     if (!listeners[event_name])
@@ -457,6 +517,8 @@ function errorHide() {
     errElm.slideUp();
 }
 
+/* UI Status */
+
 uiStatus.busy = function () {
     var body = $(document.body);
     if (body.hasClass("loaded"))
@@ -470,3 +532,57 @@ uiStatus.free = function () {
     }
 };
 
+
+/* Navbar */
+
+
+navBar.generate = function () {
+    this.root = $("#navbar");
+    var rootElm = $("<ul>", { "class": "nav col-12 p-0" }),
+        prev_li = $("<li>", { "class": "nav-item col-3 p-0" }),
+        header_li = $("<li>", { "class": "nav-item col-6 nav-header-text" }),
+        done_li = $("<li>", { "class": "nav-item col-3 p-0" }),
+        prev_a = $("<a>", { "class": "nav-link", "href": "#", "id": "prev_page" }),
+        done_a = $("<a>", { "class": "nav-link", "href": "#", "id": "done_page", "text": "Готово" });
+    prev_a.append($("<span>", { "class": "icon-arrow_back_ios" }));
+    prev_a.append($("<label>", { "class": "m-0", "text": "Назад" }));
+    prev_li.append(prev_a);
+    done_li.append(done_a);
+    rootElm.append(prev_li);
+    rootElm.append(header_li);
+    rootElm.append(done_li);
+    this.headerElm = header_li;
+    this.doneBtn = done_a;
+    this.prevBtn = prev_a;
+    this.root.append(rootElm);
+};
+
+navBar.addElement = function (elm) {
+    this.root.append(elm);
+};
+
+navBar.hideDone = function () {
+    this.doneBtn.hide();
+};
+
+navBar.hidePrev = function () {
+    this.prevBtn.hide();
+}
+
+navBar.bindPrev = function (func) {
+    this.doneBtn.off("click");
+    this.prevBtn.click(func);
+};
+
+navBar.bindDone = function (func) {
+    this.doneBtn.off("click");
+    this.doneBtn.click(func);
+};
+
+navBar.hide = function () {
+    this.root.hide();
+};
+
+navBar.setHeaderText = function (text) {
+    this.headerElm.text(text);
+};

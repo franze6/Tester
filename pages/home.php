@@ -1,25 +1,15 @@
-<div class="container">
-    <span>Добро пожаловать, <?= $user_name ?>!</span>
-    <div class="avalible_func">
-        <div class="btn-group">
-            <a class="btn btn-primary" href="?page=create">Создать тест</a>
-            <a class="btn btn-primary" href="?page=results_list">Посмотреть результаты</a>
-        </div>
-        <ui>
-
-        </ui>
+<div id="home_page">
+    <div class="p-1"></div>
+    <div class="profile_block">
+        <div class="avatar"></div>
+        <span class="profile_name"><?=$user_name?></span>
     </div>
-    <div class="current_tests">
-        <h2>Доступные тесты:</h2>
-        <div class="list_of_tests list-group">
-            <?php
-            foreach ($avalible_tests as $test) {
-                $id = $test['id'];
-                $name = $test['test_name'];
-                $owner = $test['user_name'];
-                echo "<a class='list-group-item list-group-item-action' href='?page=test&id=$id'>$name ($owner)</a>";
-            }
-            ?>
+    <div class="p-2"></div>
+    <div class="avalible_func">
+        <div class="ios-list-group">
+            <a class="ios-list-group-item ios-list-group-item-action" href="?page=create">Создать тест<i class="icon-arrow_forward_ios"></i></a>
+            <a class="ios-list-group-item ios-list-group-item-action" href="?page=results_list">Посмотреть результаты<i class="icon-arrow_forward_ios"></i></a>
+            <a class="ios-list-group-item ios-list-group-item-action" href="?page=avalible_tests">Доступные тесты<i class="icon-arrow_forward_ios"></i></a>
         </div>
     </div>
 </div>

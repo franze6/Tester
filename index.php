@@ -16,10 +16,11 @@ if (isset($_COOKIE['user_name'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
     <title>Тут будут ахуенные тесты!</title>
 </head>
+<div id="navbar" class="bg-light"></div>
 
 <body class="loaded">
     <div class="preloader">
@@ -28,12 +29,13 @@ if (isset($_COOKIE['user_name'])) {
             </path>
         </svg>
     </div>
+
     <?php if (!$isLogin) { ?>
         <div class="container">
             <span>Введите имя:</span>
             <div id="login_form" class="row">
-                <input type="text" name="user_name" id="user_name">
-                <input type="button" id="start_btn" value="Начать!">
+                <input type="text" name="user_name" placeholder="Введите имя..." id="user_name">
+                <input class="btn btn-primary" type="button" id="start_btn" value="Начать!">
             </div>
         </div>
     <?php
@@ -55,6 +57,9 @@ if (isset($_COOKIE['user_name'])) {
                     break;
                 case "results_list":
                     include 'pages/result_list.php';
+                    break;
+                case "avalible_tests":
+                    include 'pages/avalible_tests.php';
                     break;
             }
         } else {

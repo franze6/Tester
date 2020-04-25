@@ -49,9 +49,18 @@ class Worker
 
     }
 
-    function addTest($name, $id) {
+    /*function newSession() {
+        if($this->connection == null)
+            return;
+        $result = $this->connection->query("SELECT COUNT(id) as 'count' FROM users WHERE `name`='$name'");
+        if($result->fetch_assoc()['count'] == "0") {
+        }
+    }*/
+
+    function addTest($name, $test_id) {
         if($this->connection == null)
             return 0;
+        $id = $this->getUserIdbyName($_COOKIE["user_name"]);
         $result = $this->connection->query("SELECT COUNT(id) as 'count' FROM tests WHERE `name`='$name' AND `owner`='$id'");
         $data['isError'] = false;
         if($result->fetch_assoc()['count'] != "0") {
@@ -59,13 +68,19 @@ class Worker
             $data['result'] = "У вас уже есть тест с таким названием!";
         }
         else {
-            $this->connection->query("INSERT INTO tests(`name`, `owner`) VALUES('$name', '$id') ");
-            $data['result'] = $this->connection->insert_id;
+            if($test_id != "-1") {
+                $this->connection->query("UPDATE `tests` SET `name`='$name', `owner`='$id' WHERE `id`='$test_id'");
+                $data['result'] = $test_id;
+            }
+            else {
+                $this->connection->query("INSERT INTO tests(`name`, `owner`) VALUES('$name', '$id') ");
+                $data['result'] = $this->connection->insert_id;
+            }
         }
         return $data;
     }
 
-    function addQuestion($name, $id) {
+    function addQuestion($name, $id, $question_id) {
         if($this->connection == null)
             return 0;
         $result = $this->connection->query("SELECT COUNT(id) as 'count' FROM questions WHERE `text`='$name' AND `test_id`='$id'");
@@ -75,13 +90,19 @@ class Worker
             $data['result'] = "У вас уже есть вопрос с таким содержанием!";
         }
         else {
-            $this->connection->query("INSERT INTO questions(`text`, `test_id`) VALUES('$name', '$id') ");
-            $data['result'] = $this->connection->insert_id;
+            if($question_id != "-1") {
+                $this->connection->query("UPDATE `questions` SET `text`='$name', `test_id`='$id' WHERE `id`='$question_id'");
+                $data['result'] = $question_id;
+            }
+            else {
+                $this->connection->query("INSERT INTO questions(`text`, `test_id`) VALUES('$name', '$id') ");
+                $data['result'] = $this->connection->insert_id;
+            }
         }
         return $data;
     }
 
-    function addAnswer($name, $id) {
+    function addAnswer($name, $id, $answer_id) {
         if($this->connection == null)
             return 0;
         $result = $this->connection->query("SELECT COUNT(id) as 'count' FROM answers WHERE `text`='$name' AND `question_id`='$id'");
@@ -91,8 +112,14 @@ class Worker
             $data['result'] = "У вас уже есть ответ с таким содержанием!";
         }
         else {
-            $this->connection->query("INSERT INTO answers(`text`, `question_id`) VALUES('$name', '$id') ");
-            $data['result'] = $this->connection->insert_id;
+            if($answer_id != "-1") {
+                $this->connection->query("UPDATE answers SET `text` = '$name', `question_id` = '$id' WHERE `id` = '$answer_id'");
+                $data['result'] = $answer_id;
+            }
+            else {
+                $this->connection->query("INSERT INTO answers(`text`, `question_id`) VALUES('$name', '$id') ");
+                $data['result'] = $this->connection->insert_id;
+            }
         }
         return $data;
     }
@@ -108,8 +135,7 @@ class Worker
 
     function getTestDataById($id) {
         if($this->connection == null)
-            return;
-        $result_id = $this->createResultRow($id);
+            return 0;        
         $test_data = $this->connection->query("SELECT tests.name as 'test_name', users.name as 'user_name' FROM tests INNER JOIN users ON tests.owner = users.id WHERE tests.id='$id'");
         $arr = $test_data->fetch_assoc();
         $result = $this->connection->query("SELECT * FROM `questions` WHERE `test_id`='$id'");
@@ -123,7 +149,6 @@ class Worker
                 $subresult->free();
                 $arr['questions'][] = $row;
             }
-            $arr['result_id'] = $result_id;
             $result->free();
             return $arr;
         }

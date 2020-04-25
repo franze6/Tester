@@ -1,3 +1,16 @@
+:root {
+  --border-color: #cacaca;
+  --main-font-color: #000;
+  --control-bg-color: #fff;
+  --control-hover-bg-color: #e6e5eb;
+  --bg-color: #f3f2f8;
+  --blue-link-color: #007aff;
+  --placeholder-color: #979799;
+  --disabled-link-color: #d3d3d3;
+  --hover-blue-bg-color: #d2d1d7;
+}
+
+
 .container {
   margin: auto;
   padding: 25px;
@@ -49,4 +62,197 @@ input {
 
 #error_text {
   display: none;
+}
+
+#navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+#navbar .nav-link {
+  display: flex;
+}
+
+.profile_block {
+  display: flex;
+  padding: .25rem .75rem;
+  align-items: end;
+  border: 0;
+  border-bottom: 1px;
+  border-top: 1px;
+  border-style: solid;
+  border-color: #dfdfdf;
+}
+
+.profile_name {
+  padding-top: 10px;
+  font-size: 20px;
+  color: #495057;
+}
+
+.avatar {
+  width: 65px;
+  height: 65px;
+  background-image: url(img/person.jpg);
+  background-repeat: no-repeat;
+  background-position: top;
+  background-size: cover;
+  border-radius: 50%;
+}
+
+
+/* IOS Theme */
+
+
+.ios-input-text {
+  width: 100%;
+  margin: 0;
+  padding: .25rem;
+}
+
+.ios-button-text {
+  width: 100%;
+  margin: 0;
+  padding: .25rem .50rem;
+  background-color: #fff;
+  outline: none;
+  border: 0;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  border-color: #dfdfdf;
+  border-style: solid;
+  text-align: left;
+  display: flex;
+  color: #495057;
+}
+
+.ios-button-text:hover {
+  color: #495057;
+  text-decoration: none;
+  background-color: #f8f9fa;
+}
+
+.ios-tab .nav-item {
+  border: 1px solid #007bff;
+  justify-content: center;
+  width: 50%;
+}
+
+.ios-tab .nav-link {
+  border-radius: inherit;
+  padding: 0;
+  justify-content: center;
+  display: flex;
+}
+
+.ios-list-group {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.ios-list-group-item {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding: .75rem 1.25rem;
+  background-color: #fff;
+  border: 0px;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  border-color: rgba(0,0,0,.125);
+  border-style: solid;
+}
+
+.ios-list-group-item:hover {
+  color: #495057;
+  text-decoration: none;
+  background-color: #f8f9fa;
+}
+
+.ios-list-group-item+.ios-list-group-item {
+  border-top-width: 0px;
+}
+
+.ios-list-group-item-action {
+  width: 100%;
+  color: #495057;
+  text-align: inherit;
+}
+
+.right-tab {
+  border-radius: 0em .25em .25em 0em;
+  border-left: 0;
+}
+
+.left-tab {
+  border-radius: .25em 0em 0em .25em;
+}
+
+.nav-header-text {
+  text-align: center;
+  align-self: center;
+  padding: .5rem 1rem;
+}
+
+
+
+
+/* Icons */
+
+@font-face {
+  font-family: 'Icons';
+  src:  url('./fonts/Icons.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'Icons' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+
+.icon-arrow_back_ios:before {
+  font-size: 24px;
+  content: "\e900";
+}
+
+.icon-arrow_forward_ios:before {
+  font-size: 14px;
+  content: "\e901";
+  color: #c2c2c2;
+}
+
+.icon-arrow_forward_ios {
+  align-self: center;
+}
+
+.icon-add_circle:before {
+  content: "\e903";
+  color: #32ca53;
+  font-size: 20px;
+}
+
+.icon-add_circle {
+  align-self: center;
+  padding-right: .50rem;
 }
