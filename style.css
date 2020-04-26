@@ -7,7 +7,16 @@
   --blue-link-color: #007aff;
   --placeholder-color: #979799;
   --disabled-link-color: #d3d3d3;
+  --hover-link-color: #c7d8f4;
   --hover-blue-bg-color: #d2d1d7;
+}
+
+html {
+  background-color: var(--bg-color);
+}
+
+body, div {
+  background-color: rgb(0, 0, 0, 0);
 }
 
 
@@ -32,7 +41,6 @@ input {
   right: 0;
   bottom: 0;
   overflow: hidden;
-  /* фоновый цвет */
   background: rgba(0,0,0,0);
   opacity: 1;
   z-index: 1001;
@@ -65,10 +73,11 @@ input {
 }
 
 #navbar {
+  background-color: #f8f8fa;
   position: sticky;
   top: 0;
   z-index: 1000;
-  border-bottom: 1px solid rgba(0,0,0,.125);
+  border-bottom: 1px solid #bcbcbc;
 }
 
 #navbar .nav-link {
@@ -76,6 +85,7 @@ input {
 }
 
 .profile_block {
+  background-color: var(--control-bg-color);
   display: flex;
   padding: .25rem .75rem;
   align-items: end;
@@ -83,13 +93,13 @@ input {
   border-bottom: 1px;
   border-top: 1px;
   border-style: solid;
-  border-color: #dfdfdf;
+  border-color: var(--border-color);
 }
 
 .profile_name {
   padding-top: 10px;
   font-size: 20px;
-  color: #495057;
+  color: var(--main-font-color);
 }
 
 .avatar {
@@ -105,14 +115,23 @@ input {
 
 /* IOS Theme */
 
+.ios-link {
+  color: var(--blue-link-color);
+}
+
+.ios-link:hover {
+  color: var(--hover-link-color);
+}
 
 .ios-input-text {
+  background-color: var(--control-bg-color);
   width: 100%;
   margin: 0;
   padding: .25rem;
 }
 
 .ios-button-text {
+  background-color: var(--control-bg-color);
   width: 100%;
   margin: 0;
   padding: .25rem .50rem;
@@ -121,26 +140,27 @@ input {
   border: 0;
   border-top-width: 1px;
   border-bottom-width: 1px;
-  border-color: #dfdfdf;
+  border-color: var(--border-color);
   border-style: solid;
   text-align: left;
   display: flex;
-  color: #495057;
+  color: var(--main-font-color);
 }
 
 .ios-button-text:hover {
-  color: #495057;
+  color: var(--main-font-color);
   text-decoration: none;
   background-color: #f8f9fa;
 }
 
 .ios-tab .nav-item {
-  border: 1px solid #007bff;
   justify-content: center;
   width: 50%;
 }
 
 .ios-tab .nav-link {
+  color: var(--blue-link-color);
+  border: 1px solid var(--blue-link-color);
   border-radius: inherit;
   padding: 0;
   justify-content: center;
@@ -148,6 +168,7 @@ input {
 }
 
 .ios-list-group {
+  background-color: var(--control-bg-color);
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;
@@ -157,6 +178,7 @@ input {
 }
 
 .ios-list-group-item {
+  background-color: var(--control-bg-color);
   position: relative;
   display: flex;
   justify-content: space-between;
@@ -165,12 +187,12 @@ input {
   border: 0px;
   border-top-width: 1px;
   border-bottom-width: 1px;
-  border-color: rgba(0,0,0,.125);
+  border-color: var(--border-color);
   border-style: solid;
 }
 
 .ios-list-group-item:hover {
-  color: #495057;
+  color: var(--main-font-color);
   text-decoration: none;
   background-color: #f8f9fa;
 }
@@ -181,7 +203,7 @@ input {
 
 .ios-list-group-item-action {
   width: 100%;
-  color: #495057;
+  color: var(--main-font-color);
   text-align: inherit;
 }
 
@@ -200,7 +222,9 @@ input {
   padding: .5rem 1rem;
 }
 
-
+*::placeholder {
+  color: var(--placeholder-color);
+}
 
 
 /* Icons */

@@ -20,7 +20,7 @@ if (isset($_COOKIE['user_name'])) {
     <link rel="stylesheet" href="style.css">
     <title>Тут будут ахуенные тесты!</title>
 </head>
-<div id="navbar" class="bg-light"></div>
+<div id="navbar"></div>
 
 <body class="loaded">
     <div class="preloader">

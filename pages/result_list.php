@@ -1,4 +1,4 @@
-<ul class="nav nav-pills p-1 ios-tab" id="results_list" role="tablist">
+<ul class="nav nav-pills p-1 ios-tab" id="results_tabs" role="tablist">
     <li class="nav-item left-tab">
         <a class="nav-link active" id="my_results-tab" data-toggle="pill" href="#my_results" role="tab" aria-controls="my_results" aria-selected="true">Мои результаты</a>
     </li>

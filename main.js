@@ -31,9 +31,9 @@ $(document).ready(function () {
         loadResult(result_elm.attr('data-id'));
     }
 
-    var results_list = $("#results_list");
-    if (results_list.length == 1) {
-        navBar.addElement(results_list);
+    var results_tabs = $("#results_tabs");
+    if (results_tabs.length == 1) {
+        navBar.addElement(results_tabs);
         navBar.hideDone();
         navBar.setHeaderText("Результаты");
         loadResults("my");
@@ -542,8 +542,8 @@ navBar.generate = function () {
         prev_li = $("<li>", { "class": "nav-item col-3 p-0" }),
         header_li = $("<li>", { "class": "nav-item col-6 nav-header-text" }),
         done_li = $("<li>", { "class": "nav-item col-3 p-0" }),
-        prev_a = $("<a>", { "class": "nav-link", "href": "#", "id": "prev_page" }),
-        done_a = $("<a>", { "class": "nav-link", "href": "#", "id": "done_page", "text": "Готово" });
+        prev_a = $("<a>", { "class": "nav-link ios-link", "href": "#", "id": "prev_page" }),
+        done_a = $("<a>", { "class": "nav-link ios-link", "href": "#", "id": "done_page", "text": "Готово" });
     prev_a.append($("<span>", { "class": "icon-arrow_back_ios" }));
     prev_a.append($("<label>", { "class": "m-0", "text": "Назад" }));
     prev_li.append(prev_a);
@@ -586,3 +586,7 @@ navBar.hide = function () {
 navBar.setHeaderText = function (text) {
     this.headerElm.text(text);
 };
+
+navBar.setDoneText = function (text) {  
+    this.doneBtn.text(text);
+}
