@@ -49,6 +49,11 @@ class Worker
 
     }
 
+    function logout() {
+        unset($_COOKIE['user_name']); 
+        setcookie('user_name', null, -1); 
+    }
+
     /*function newSession() {
         if($this->connection == null)
             return;

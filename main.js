@@ -14,8 +14,7 @@ $(document).ready(function () {
             url: "ajax.php",
             data: "do=new_user&user_name=" + $('#user_name').val(),
             success: (response) => {
-                if (response == 1)
-                    window.location.href = window.location.href;
+                window.location = "";
             }
         });
     });
@@ -62,6 +61,11 @@ $(document).ready(function () {
     var create = $("#create_test");
     if(create.length == 1) {
         navBar.setHeaderText("Создание теста");
+    }
+
+    var profile = $("#profile");
+    if(profile.length == 1) {
+        $("#logout").click(logout);
     }
 
     $('#next_question').click(function () {
@@ -475,6 +479,17 @@ function generateResultsList(data, type) {
     }
     $("#" + type + "_results").empty();
     $("#" + type + "_results").append(rootElm);
+}
+
+function logout() {
+    $.ajax({
+        type: "post",
+        url: "ajax.php",
+        data: "do=logout",
+        success: (response) => {
+            window.location = "";
+        }
+    });
 }
 
 function addListener(event_name, callback) {

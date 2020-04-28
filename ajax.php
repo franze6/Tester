@@ -56,6 +56,8 @@ if($do == "new_user") {
     echo json_encode($work->getMyResults());
     elseif($_REQUEST['type'] == "other")
     echo json_encode($work->getOtherResults());
-} 
+} elseif ($do == "logout") {
+    $work->logout();
+}
 
 

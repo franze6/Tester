@@ -87,13 +87,8 @@ input {
 .profile_block {
   background-color: var(--control-bg-color);
   display: flex;
-  padding: .25rem .75rem;
   align-items: end;
   border: 0;
-  border-bottom: 1px;
-  border-top: 1px;
-  border-style: solid;
-  border-color: var(--border-color);
 }
 
 .profile_name {
@@ -115,14 +110,6 @@ input {
 
 /* IOS Theme */
 
-.ios-link {
-  color: var(--blue-link-color);
-}
-
-.ios-link:hover {
-  color: var(--hover-link-color);
-}
-
 .ios-input-text {
   background-color: var(--control-bg-color);
   width: 100%;
@@ -134,7 +121,7 @@ input {
   background-color: var(--control-bg-color);
   width: 100%;
   margin: 0;
-  padding: .25rem .50rem;
+  padding: .50rem .50rem;
   background-color: #fff;
   outline: none;
   border: 0;
@@ -182,7 +169,7 @@ input {
   position: relative;
   display: flex;
   justify-content: space-between;
-  padding: .75rem 1.25rem;
+  padding: .50rem .50rem;
   background-color: #fff;
   border: 0px;
   border-top-width: 1px;
@@ -224,6 +211,23 @@ input {
 
 *::placeholder {
   color: var(--placeholder-color);
+}
+
+
+.ios-link {
+  color: var(--blue-link-color);
+}
+
+.ios-link:hover {
+  color: var(--hover-link-color);
+}
+
+.ios-red {
+  color: red;
+}
+
+.ios-red:hover {
+  color: red;
 }
 
 

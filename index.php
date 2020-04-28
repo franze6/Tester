@@ -61,6 +61,9 @@ if (isset($_COOKIE['user_name'])) {
                 case "avalible_tests":
                     include 'pages/avalible_tests.php';
                     break;
+                case "profile":
+                    include 'pages/profile.php';
+                    break;
             }
         } else {
             include 'pages/home.php';

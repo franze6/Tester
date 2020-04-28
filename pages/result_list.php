@@ -7,7 +7,7 @@
     </li>
 </ul>
 <div class="tab-content" id="pills-tabContent">
-    <div class="p-2"></div>
+    <div class="p-1"></div>
     <div class="tab-pane fade show active" id="my_results" role="tabpanel" aria-labelledby="my_results-tab">
     Мое
     </div>

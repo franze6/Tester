@@ -1,9 +1,12 @@
 <div id="home_page">
     <div class="p-1"></div>
-    <div class="profile_block">
-        <div class="avatar"></div>
-        <span class="profile_name"><?=$user_name?></span>
-    </div>
+    <a class="ios-list-group-item" href="?page=profile">
+        <div class="profile_block"> 
+            <div class="avatar"></div>
+            <span class="profile_name"><?=$user_name?></span>
+        </div>
+        <i class="icon-arrow_forward_ios"></i>
+    </a>
     <div class="p-2"></div>
     <div class="avalible_func">
         <div class="ios-list-group">
